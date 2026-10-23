@@ -1,0 +1,14 @@
+{
+  "name": "kick-obs-chat-overlay",
+  "version": "1.0.0",
+  "description": "Overlay de Chat da Kick para OBS Studio",
+  "main": "server.js",
+  "scripts": {
+    "start": "node --experimental-websocket server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": ["kick", "obs", "chat", "overlay", "websocket"],
+  "license": "MIT"
+}
