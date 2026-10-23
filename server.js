@@ -228,13 +228,36 @@ function subscribeToAllChannelTopics(info) {
   subscribeTopic(`channel.${info.channelId}`);
 }
 
+// Transmitir eventos filtrados apenas para quem está assistindo o canal correspondente
 function broadcastEvent(eventData) {
   const formatted = `data: ${JSON.stringify(eventData)}\n\n`;
+  const eventTopic = eventData.channel; // Ex: 'chatrooms.14039724.v2', 'channel.14239844' ou 'test'
+
   for (const client of sseClients) {
-    try {
-      client.res.write(formatted);
-    } catch (e) {
-      sseClients.delete(client);
+    // Se for mensagem de teste (/test), envia para todas as telas
+    if (eventTopic === 'test') {
+      try {
+        client.res.write(formatted);
+      } catch (e) {
+        sseClients.delete(client);
+      }
+      continue;
+    }
+
+    // Identifica o canal deste cliente
+    const clientInfo = channelCache.get(client.channelSlug);
+    if (!clientInfo) continue;
+
+    const chatroomTopic = `chatrooms.${clientInfo.chatroomId}.v2`;
+    const channelTopic = `channel.${clientInfo.channelId}`;
+
+    // Só envia a mensagem se o tópico for exatamente o canal que o usuário abriu!
+    if (eventTopic === chatroomTopic || eventTopic === channelTopic) {
+      try {
+        client.res.write(formatted);
+      } catch (e) {
+        sseClients.delete(client);
+      }
     }
   }
 }
