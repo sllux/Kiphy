@@ -251,7 +251,7 @@ const server = http.createServer(async (req, res) => {
   const searchParams = reqUrl.searchParams;
 
   // 1. Rota SSE para o OBS Studio
-  if (pathname === '/events') {
+ if (pathname === '/events') {
     const rawChannel = searchParams.get('channel') || DEFAULT_CHANNEL;
     const channelSlug = sanitizeSlug(rawChannel);
 
@@ -337,11 +337,11 @@ const server = http.createServer(async (req, res) => {
   // 3. Servir Overlay HTML
   if (pathname === '/' || pathname === '/index.html') {
     const htmlPath = path.join(__dirname, 'public', 'index.html');
-    if (fs.existsSync(htmlPath)) {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-      fs.createReadStream(htmlPath).pipe(res);
-      return;
-    }
+	  if (fs.existsSync(htmlPath)) {
+		res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+		fs.createReadStream(htmlPath).pipe(res);
+		return;
+	  }
   }
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
