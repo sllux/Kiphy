@@ -9,10 +9,10 @@
 
     :root {
       --ink: #000000;
-      --bubble-bg: #ecebf7;
-      --bubble-text: #1b1747;
-      --shadow: #2b1f86;
-      --tag-purple: #6a4bdc;
+      --bubble-bg: #f2efe6;
+      --bubble-text: #050505;
+      --shadow: rgba(0, 0, 0, 0.45);
+      --tag-purple: #5e17eb;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -23,31 +23,41 @@
       overflow: hidden;
       width: 100vw;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 20px;
+      padding: 16px 20px 24px 20px;
     }
 
+    /* Container de mensagens */
     #chat-container {
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      max-height: 100%;
-      overflow: hidden;
+      gap: 12px;
+      height: 100%;
+      width: 100%;
+      overflow-y: hidden;
       align-items: flex-start;
-      padding: 14px 26px 6px 4px; /* espaço para emote e "?" que vazam do balão */
-      mask-image: linear-gradient(to top, rgba(0,0,0,1) 93%, rgba(0,0,0,0) 100%);
-      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 93%, rgba(0,0,0,0) 100%);
+      scroll-behavior: smooth;
+      padding-right: 14px;
+      padding-top: 10px;
+      mask-image: linear-gradient(to top, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
+      -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
     }
 
+    /* Espaçador flexível que mantém o chat no fundo sem cortar a base */
+    #chat-spacer {
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+
+    /* Cada conjunto de mensagem (Tag + Balão) */
     .message-wrapper {
       display: flex;
       flex-direction: column;
       align-items: flex-start;
       max-width: 100%;
-      animation: popIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+      flex-shrink: 0;
+      animation: popIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
       transition: opacity 0.4s ease, transform 0.4s ease;
+      position: relative;
     }
 
     @keyframes popIn {
@@ -60,93 +70,128 @@
       transform: translateY(-8px) scale(0.98);
     }
 
-    /* Tag do usuário */
+    /* Tag do Usuário no Topo */
     .username-tag {
       display: inline-flex;
       align-items: center;
-      gap: 4px;
+      gap: 5px;
       background: var(--tag-purple);
       color: #ffffff;
       border: 2px solid var(--ink);
-      border-radius: 4px;
-      padding: 2px 7px 2px 5px;
-      font-size: 13px;
-      font-weight: 800;
+      border-radius: 5px;
+      padding: 2px 8px 3px 6px;
+      font-size: 13.5px;
+      font-weight: 900;
       letter-spacing: -0.1px;
       position: relative;
       z-index: 2;
-      margin-left: 0;
+      margin-left: 2px;
       box-shadow: 2px 2px 0 var(--shadow);
     }
 
-    .badges { display: inline-flex; align-items: center; gap: 3px; }
+    .badges {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
     .badges:empty { display: none; }
 
-    .badge-icon { width: 14px; height: 14px; object-fit: contain; vertical-align: middle; }
-    .badge-symbol { font-size: 11px; line-height: 1; }
+    .badge-icon {
+      height: 16px;
+      width: auto;
+      border-radius: 3px;
+      vertical-align: middle;
+    }
 
-    .username-text { color: #ffffff; font-weight: 800; line-height: 1.2; }
+    .badge-symbol {
+      font-size: 11px;
+      line-height: 1;
+    }
 
-    /* Balão */
+    .username-text {
+      color: #ffffff;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    /* Balão de Fala */
     .speech-bubble {
       position: relative;
       background: var(--bubble-bg);
       color: var(--bubble-text);
       border: 2px solid var(--ink);
-      border-radius: 4px;
-      padding: 5px 11px 6px 9px;
-      font-size: 14px;
+      border-radius: 5px;
+      padding: 6px 12px 6px 10px;
+      font-size: 14.5px;
       font-weight: 800;
-      line-height: 1.3;
-      margin-left: 7px;
+      line-height: 1.32;
+      margin-left: 8px;
       margin-top: -2px;
       display: inline-block;
       max-width: 95%;
       word-break: break-word;
-      box-shadow: 3px 3px 0 var(--shadow);
+      box-shadow: 2px 2px 0 var(--shadow);
     }
 
-    /* Emotes: maiores, e o último "pendura" para fora do balão */
-    .emote {
-      display: inline-block;
-      height: 30px;
-      vertical-align: -9px;
-      margin: 0 1px;
+    /* Rabicho do balão apontando para a esquerda (borda preta) */
+    .speech-bubble::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: -9px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 9px solid var(--ink);
+      z-index: 2;
     }
 
-    .speech-bubble.ends-emote { padding-right: 20px; }
-    .speech-bubble.ends-emote .emote.last {
-      height: 34px;
-      margin-right: -26px;
-      margin-bottom: -10px;
-      position: relative;
-      top: 2px;
+    /* Preenchimento do rabicho (cobre a borda interna) */
+    .speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: -6px;
+      width: 0;
+      height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-right: 7px solid var(--bubble-bg);
       z-index: 3;
     }
 
-    /* Marcas de quadrinho: "?" e "!!" vermelhos no canto superior direito */
-    .mark {
+    /* Emotes da Kick */
+    .emote {
+      display: inline-block;
+      height: 28px;
+      vertical-align: -6px;
+      margin: 0 2px;
+    }
+
+    /* Marcas de quadrinho estilo mangá: "?" e "!!" vermelhos */
+    .comic-mark {
       position: absolute;
-      top: -17px;
-      right: -9px;
+      top: -16px;
+      right: -10px;
       font-weight: 900;
       font-size: 22px;
       line-height: 1;
-      color: #e5252d;
+      color: #ff1e27;
       -webkit-text-stroke: 1.5px #ffffff;
       paint-order: stroke fill;
       text-shadow: 1px 1px 0 var(--ink), -1px 1px 0 var(--ink), 1px -1px 0 var(--ink), -1px -1px 0 var(--ink);
       transform: rotate(14deg);
-      z-index: 4;
+      z-index: 5;
       pointer-events: none;
     }
 
-    /* Alertas */
+    /* Alertas Especiais (Subs, Presentes, Raids) */
     .alert-sub  .username-tag { background: #D97706 !important; }
     .alert-gift .username-tag { background: #DB2777 !important; }
-    .alert-follow .username-tag { background: #7C3AED !important; }
     .alert-raid .username-tag { background: #0891B2 !important; }
 
+    /* Indicador discreto de status */
     #status-pill {
       position: absolute;
       top: 10px;
@@ -162,6 +207,7 @@
       align-items: center;
       gap: 6px;
       opacity: 0.8;
+      z-index: 10;
     }
     #status-pill.hidden { display: none; }
     .status-dot { width: 7px; height: 7px; background: #53FC18; border-radius: 50%; box-shadow: 0 0 6px #53FC18; }
@@ -175,11 +221,15 @@
     <span id="status-text">Conectando...</span>
   </div>
 
-  <div id="chat-container"></div>
+  <div id="chat-container">
+    <div id="chat-spacer"></div>
+  </div>
 
   <script>
+    // 1. Ler parâmetros da URL (?fade=20, ?channel=...)
     const urlParams = new URLSearchParams(window.location.search);
 
+    // 2. Detectar canal dinamicamente (pelo caminho /canalnome ou pelo parâmetro ?channel=canalnome)
     const pathSlug = window.location.pathname.replace(/^\/+/, '').split('/')[0].trim();
     const reservedPaths = ['events', 'test', 'api', 'favicon.ico', 'index.html'];
 
@@ -194,8 +244,7 @@
     const fadeTimeout = parseInt(urlParams.get('fade') || '25', 10);
     const maxMessages = parseInt(urlParams.get('max') || '20', 10);
     const hideStatus = urlParams.get('hide_status') === 'true';
-    // auto (padrão): alterna entre tons de roxo/azul como no print | purple | kick | user
-    const tagColorMode = urlParams.get('tag_color') || 'auto';
+    const tagColorMode = urlParams.get('tag_color') || 'purple';
 
     const container = document.getElementById('chat-container');
     const statusPill = document.getElementById('status-pill');
@@ -203,14 +252,6 @@
     const statusText = document.getElementById('status-text');
 
     if (hideStatus) statusPill.classList.add('hidden');
-
-    const TAG_PALETTE = ['#6a4bdc', '#5a56e6', '#4d6bf0'];
-
-    function hashString(str) {
-      let h = 0;
-      for (let i = 0; i < str.length; i++) h = (h * 31 + str.charCodeAt(i)) >>> 0;
-      return h;
-    }
 
     function escapeHtml(s) {
       return String(s)
@@ -220,17 +261,21 @@
         .replace(/"/g, '&quot;');
     }
 
+    // Processamento de Emotes da Kick: [emote:ID:NAME]
     function parseEmotes(text) {
       if (!text) return '';
-      const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
-      return escaped.replace(/\[emote:(\d+):([a-zA-Z0-9_-]+)\]/g, (m, id, name) =>
-        `<img class="emote" src="https://files.kick.com/emotes/${id}/fullsize" alt="${name}" title="${name}" />`
-      );
+      const escaped = escapeHtml(text);
+      return escaped.replace(/\[emote:(\d+):([a-zA-Z0-9_-]+)\]/g, (match, emoteId, emoteName) => {
+        return `<img class="emote" src="https://files.kick.com/emotes/${emoteId}/fullsize" alt="${emoteName}" title="${emoteName}" loading="lazy" />`;
+      });
     }
 
+    // Renderizar Badges oficiais da Kick
     function renderBadges(identity) {
       if (!identity) return '';
       let html = '<div class="badges">';
+
+      // Badges v2 com ícones oficiais (níveis coloridos, badges de sub)
       if (Array.isArray(identity.badges_v2) && identity.badges_v2.length > 0) {
         for (const badge of identity.badges_v2) {
           if (badge.image_url) {
@@ -246,25 +291,27 @@
           else if (badge.type === 'subscriber') html += `<span class="badge-symbol" title="Inscrito">⭐</span>`;
         }
       }
+
       html += '</div>';
       return html;
     }
 
-    function resolveTagColor(identity, username) {
+    function resolveTagColor(identity) {
       if (tagColorMode === 'kick') return '#53FC18';
       if (tagColorMode === 'user' && identity?.color) return identity.color;
-      if (tagColorMode === 'purple') return TAG_PALETTE[0];
-      return TAG_PALETTE[hashString(username.toLowerCase()) % TAG_PALETTE.length];
+      return '#5e17eb'; // Roxo vibrante idêntico ao print
     }
 
-    // Decoração de quadrinho conforme a pontuação final da mensagem
-    function resolveMark(rawContent) {
-      const plain = (rawContent || '').replace(/\[emote:\d+:[^\]]+\]/g, '').trim();
-      if (/!\s*$/.test(plain)) return '!!';
-      if (/\?\s*$/.test(plain)) return '?';
+    // Detecta interrogação ou exclamação final para adicionar a marca de quadrinho "? / !!"
+    function detectComicMark(rawContent) {
+      if (!rawContent) return '';
+      const plain = rawContent.replace(/\[emote:[^\]]+\]/g, '').trim();
+      if (/\?+\s*$/.test(plain)) return '?';
+      if (/!{1,}\s*$/.test(plain)) return '!!';
       return '';
     }
 
+    // Adicionar Mensagem Normal de Chat
     function addMessage(msg) {
       if (!msg || !msg.sender) return;
 
@@ -275,31 +322,26 @@
 
       const username = msg.sender.username || 'Anônimo';
       const badgesHtml = renderBadges(msg.sender.identity);
-      const tagBgColor = resolveTagColor(msg.sender.identity, username);
+      const tagBgColor = resolveTagColor(msg.sender.identity);
       const rawContent = msg.content || '';
       const parsedContent = parseEmotes(rawContent);
-      const endsWithEmote = /\[emote:\d+:[^\]]+\]\s*$/.test(rawContent);
-      const mark = resolveMark(rawContent);
+      const mark = detectComicMark(rawContent);
 
       wrapper.innerHTML = `
         <div class="username-tag" style="background-color: ${tagBgColor}">
           ${badgesHtml}
           <span class="username-text">${escapeHtml(username)}</span>
         </div>
-        <div class="speech-bubble${endsWithEmote ? ' ends-emote' : ''}">
-          ${mark ? `<span class="mark">${mark}</span>` : ''}
+        <div class="speech-bubble">
+          ${mark ? `<span class="comic-mark">${mark}</span>` : ''}
           ${parsedContent}
         </div>
       `;
 
-      if (endsWithEmote) {
-        const emotes = wrapper.querySelectorAll('.speech-bubble .emote');
-        if (emotes.length) emotes[emotes.length - 1].classList.add('last');
-      }
-
       appendWithLimit(wrapper);
     }
 
+    // Adicionar Alerta (Sub, Gift, Raid)
     function addAlert(alertType, tagLabel, bubbleText, icon) {
       const wrapper = document.createElement('div');
       wrapper.className = `message-wrapper alert-${alertType}`;
@@ -313,21 +355,34 @@
       appendWithLimit(wrapper);
     }
 
+    // Adicionar elemento com auto-scroll sem cortes na base
     function appendWithLimit(el) {
       container.appendChild(el);
-      while (container.children.length > maxMessages) {
-        container.removeChild(container.firstChild);
+
+      // Limitar mensagens
+      const messages = container.querySelectorAll('.message-wrapper');
+      if (messages.length > maxMessages) {
+        messages[0].remove();
       }
+
+      // Rola sempre até o final para NUNCA cortar a mensagem mais nova
+      requestAnimationFrame(() => {
+        container.scrollTop = container.scrollHeight;
+      });
+
       if (fadeTimeout > 0) {
         setTimeout(() => {
           el.classList.add('fade-out');
           setTimeout(() => {
-            if (el.parentNode === container) container.removeChild(el);
+            if (el.parentNode === container) {
+              container.removeChild(el);
+            }
           }, 450);
         }, fadeTimeout * 1000);
       }
     }
 
+    // Conectar ao stream de eventos SSE
     function connectEvents() {
       statusText.textContent = `Kick: ${channel}`;
       statusDot.className = 'status-dot';
@@ -345,34 +400,31 @@
           const type = payload.type;
           const data = payload.data;
 
+          // 1. Mensagens de Chat
           if (type && type.includes('ChatMessage')) {
             addMessage(data);
           }
+          // 2. Inscrições (Subs)
           else if (type === 'App\\Events\\SubscriptionEvent' || type === 'App\\Events\\ChannelSubscriptionEvent') {
             const username = escapeHtml(data.username || data.user?.username || 'Alguém');
             const months = data.months || data.months_subscribed || 1;
             const monthsText = months > 1 ? ` (${months} meses)` : '';
             addAlert('sub', 'NOVA INSCRIÇÃO', `🎉 <b>${username}</b> acabou de se inscrever!${monthsText}`, '⭐');
           }
+          // 3. Presentes de Subs (Gifted Subs)
           else if (type === 'App\\Events\\GiftedSubscriptionsEvent') {
             const gifter = escapeHtml(data.gifter_username || data.gifter?.username || 'Alguém');
             const count = Array.isArray(data.gifted_usernames) ? data.gifted_usernames.length : (data.giftedCount || 1);
             addAlert('gift', 'PRESENTE DE SUBS', `🎁 <b>${gifter}</b> presenteou <b>${count}</b> inscrição(ões) para o chat!`, '🎁');
           }
-          else if (type === 'App\\Events\\FollowEvent' || type === 'App\\Events\\FollowersUpdated' || type === 'FollowersUpdated') {
-            const followerName = data.username || data.follower?.username || data.user?.username || null;
-            const totalText = data.followersCount ? ` (Total: ${Number(data.followersCount).toLocaleString('pt-BR')})` : '';
-            const followText = followerName
-              ? `💜 <b>${escapeHtml(followerName)}</b> começou a seguir o canal!${totalText}`
-              : `💜 Novo seguidor na live!${totalText}`;
-            addAlert('follow', 'NOVO SEGUIDOR', followText, '👤');
-          }
+          // 4. Raids / Hosts
           else if (type === 'App\\Events\\StreamHostEvent') {
             const hoster = escapeHtml(data.hoster_username || data.username || 'Um streamer');
             const viewers = data.number_viewers || data.viewers || '';
             const viewersText = viewers ? ` com <b>${viewers}</b> espectadores` : '';
             addAlert('raid', 'RAID / HOST', `🚀 <b>${hoster}</b> invadiu a live${viewersText}!`, '🚀');
           }
+          // 5. Moderação: Mensagem Apagada
           else if (type === 'App\\Events\\MessageDeletedEvent') {
             const deletedId = data?.message?.id || data?.id;
             const targetEl = document.getElementById(`msg-${deletedId}`);
@@ -381,6 +433,7 @@
               setTimeout(() => targetEl.remove(), 400);
             }
           }
+          // 6. Moderação: Usuário Banido / Mutado
           else if (type === 'App\\Events\\UserBannedEvent') {
             const bannedUser = (data?.user?.username || '').toLowerCase();
             container.querySelectorAll(`[data-username="${bannedUser}"]`).forEach(el => {
