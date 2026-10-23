@@ -1,10 +1,8 @@
 /**
  * Kick Chat & Alerts OBS Overlay Server (Centrifugo WebSocket Relay)
- * Conecta ao WebSocket da Kick recebendo:
- * - Mensagens do Chat em Tempo Real
- * - Inscrições (Subs)
- * - Presentes de Subs (Gifted Subs)
- * - Moderação (Deletes / Bans)
+ * Suporta canais dinâmicos via URL:
+ * https://kiphy.onrender.com/nomedocanal
+ * ou https://kiphy.onrender.com/?channel=nomedocanal
  */
 
 const http = require('http');
@@ -82,7 +80,6 @@ async function getChannelInfo(rawSlug) {
 // 2. Obter Token Guest JWT para o Centrifugo
 async function getKickRealtimeToken() {
   const clientId = generateUUID();
-  console.log('[Kick] Solicitando token de conexão...');
 
   const res = await fetch('https://web.kick.com/api/v1/realtime/auth/connection', {
     method: 'POST',
@@ -114,7 +111,6 @@ async function connectToKick() {
   try {
     currentToken = await getKickRealtimeToken();
     const wsUrl = 'wss://realtime.us-west-2.platform.kick.com/connection/websocket';
-    console.log(`[Kick] Conectando ao WebSocket Centrifugo...`);
 
     const wsOptions = {
       headers: {
@@ -130,7 +126,7 @@ async function connectToKick() {
     }
 
     kickWs.onopen = () => {
-      console.log('[Kick WS] Conexão estabelecida! Autenticando...');
+      console.log('[Kick WS] Conexão estabelecida! Autenticando com Centrifugo...');
       const connectCommand = {
         connect: {
           token: currentToken,
@@ -167,7 +163,6 @@ function handleKickMessage(raw) {
   for (const line of lines) {
     if (!line.trim()) continue;
 
-    // Heartbeat ping pong: o servidor envia "{}" a cada 25s
     if (line.trim() === '{}') {
       if (kickWs && kickWs.readyState === WebSocketClient.OPEN) {
         kickWs.send('{}');
@@ -179,7 +174,7 @@ function handleKickMessage(raw) {
       const msg = JSON.parse(line);
 
       if (msg.connect) {
-        console.log(`[Kick WS] ✅ Autenticado com sucesso! Pronto para receber mensagens.`);
+        console.log(`[Kick WS] ✅ Autenticado com sucesso! Pronto para receber eventos.`);
         for (const [slug, info] of channelCache.entries()) {
           subscribeToAllChannelTopics(info);
         }
@@ -250,8 +245,8 @@ const server = http.createServer(async (req, res) => {
   const pathname = reqUrl.pathname;
   const searchParams = reqUrl.searchParams;
 
-  // 1. Rota SSE para o OBS Studio
- if (pathname === '/events') {
+  // 1. Rota SSE para o OBS Studio (/events)
+  if (pathname === '/events') {
     const rawChannel = searchParams.get('channel') || DEFAULT_CHANNEL;
     const channelSlug = sanitizeSlug(rawChannel);
 
@@ -279,7 +274,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 2. Rota para simular testes no OBS
+  // 2. Rota para simular testes no OBS (/test)
   if (pathname === '/test' || pathname === '/api/test') {
     const eventType = searchParams.get('type') || 'all';
 
@@ -334,14 +329,19 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. Servir Overlay HTML
-  if (pathname === '/' || pathname === '/index.html') {
-    const htmlPath = path.join(__dirname, 'public', 'index.html');
-	  if (fs.existsSync(htmlPath)) {
-		res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
-		fs.createReadStream(htmlPath).pipe(res);
-		return;
-	  }
+  // 3. Favicon (evita 404 nos logs)
+  if (pathname === '/favicon.ico') {
+    res.writeHead(204);
+    res.end();
+    return;
+  }
+
+  // 4. Qualquer outra rota (ex: '/', '/xqc', '/coringa', '/renanbalinha') serve o overlay!
+  const htmlPath = path.join(__dirname, 'public', 'index.html');
+  if (fs.existsSync(htmlPath)) {
+    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    fs.createReadStream(htmlPath).pipe(res);
+    return;
   }
 
   res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
@@ -350,10 +350,9 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, async () => {
   console.log('====================================================');
-  console.log(`🚀 Kick Chat & Alerts OBS Server rodando na porta ${PORT}`);
-  console.log(`📺 Canal conectado: ${DEFAULT_CHANNEL}`);
-  console.log(`🔗 URL para o OBS: http://localhost:${PORT}/?channel=${DEFAULT_CHANNEL}`);
-  console.log(`🧪 Testar no navegador: http://localhost:${PORT}/test`);
+  console.log(`🚀 Kick Chat Overlay Server rodando na porta ${PORT}`);
+  console.log(`📺 Exemplo: http://localhost:${PORT}/renanbalinha`);
+  console.log(`📺 Ou outro: http://localhost:${PORT}/xqc`);
   console.log('====================================================');
 
   try {
