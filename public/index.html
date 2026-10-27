@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kick Chat Overlay - Comic Speech Bubble</title>
+  <title>Kick Chat Overlay - Multi-Theme</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@500;600;700;800&family=Nunito:wght@700;800;900&display=swap');
 
     :root {
       --ink: #000000;
@@ -19,14 +19,13 @@
 
     body {
       background: transparent;
-      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       overflow: hidden;
       width: 100vw;
       height: 100vh;
       padding: 16px 20px 24px 20px;
     }
 
-    /* Container de mensagens */
+    /* Container de mensagens com auto-scroll e fade superior */
     #chat-container {
       display: flex;
       flex-direction: column;
@@ -42,13 +41,12 @@
       -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,1) 90%, rgba(0,0,0,0) 100%);
     }
 
-    /* Espaçador flexível que mantém o chat no fundo sem cortar a base */
+    /* Espaçador flexível para o chat começar na base */
     #chat-spacer {
       flex: 1 1 auto;
       min-height: 0;
     }
 
-    /* Cada conjunto de mensagem (Tag + Balão) */
     .message-wrapper {
       display: flex;
       flex-direction: column;
@@ -70,8 +68,14 @@
       transform: translateY(-8px) scale(0.98);
     }
 
-    /* Tag do Usuário no Topo */
-    .username-tag {
+    /* ============================================================
+       TEMA 1: COMIC (Balões de Quadrinhos - Padrão)
+       ============================================================ */
+    body.theme-comic {
+      font-family: 'Nunito', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body.theme-comic .username-tag {
       display: inline-flex;
       align-items: center;
       gap: 5px;
@@ -87,6 +91,139 @@
       z-index: 2;
       margin-left: 2px;
       box-shadow: 2px 2px 0 var(--shadow);
+    }
+
+    body.theme-comic .speech-bubble {
+      position: relative;
+      background: var(--bubble-bg);
+      color: var(--bubble-text);
+      border: 2px solid var(--ink);
+      border-radius: 5px;
+      padding: 6px 12px 6px 10px;
+      font-size: 14.5px;
+      font-weight: 800;
+      line-height: 1.32;
+      margin-left: 8px;
+      margin-top: -2px;
+      display: inline-block;
+      max-width: 95%;
+      word-break: break-word;
+      box-shadow: 2px 2px 0 var(--shadow);
+    }
+
+    body.theme-comic .speech-bubble::before {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: -9px;
+      width: 0;
+      height: 0;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+      border-right: 9px solid var(--ink);
+      z-index: 2;
+    }
+
+    body.theme-comic .speech-bubble::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: -6px;
+      width: 0;
+      height: 0;
+      border-top: 4px solid transparent;
+      border-bottom: 4px solid transparent;
+      border-right: 7px solid var(--bubble-bg);
+      z-index: 3;
+    }
+
+    body.theme-comic .comic-mark {
+      position: absolute;
+      top: -16px;
+      right: -10px;
+      font-weight: 900;
+      font-size: 22px;
+      line-height: 1;
+      color: #ff1e27;
+      -webkit-text-stroke: 1.5px #ffffff;
+      paint-order: stroke fill;
+      text-shadow: 1px 1px 0 var(--ink), -1px 1px 0 var(--ink), 1px -1px 0 var(--ink), -1px -1px 0 var(--ink);
+      transform: rotate(14deg);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    body.theme-comic .alert-sub .username-tag { background: #D97706 !important; }
+    body.theme-comic .alert-gift .username-tag { background: #DB2777 !important; }
+    body.theme-comic .alert-raid .username-tag { background: #0891B2 !important; }
+
+    /* ============================================================
+       TEMA 2: GLASS (Modern Glassmorphism)
+       ============================================================ */
+    body.theme-glass {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body.theme-glass .message-wrapper {
+      background: rgba(18, 24, 38, 0.68);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-left: 3.5px solid #53FC18;
+      border-radius: 10px;
+      padding: 8px 14px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+      gap: 3px;
+    }
+
+    body.theme-glass .username-tag {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    body.theme-glass .username-text {
+      font-weight: 700;
+      font-size: 13.5px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    }
+
+    body.theme-glass .speech-bubble {
+      background: transparent !important;
+      border: none !important;
+      box-shadow: none !important;
+      padding: 0 !important;
+      margin: 0 !important;
+      color: #F1F5F9;
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 1.4;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.6);
+    }
+
+    body.theme-glass .speech-bubble::before,
+    body.theme-glass .speech-bubble::after,
+    body.theme-glass .comic-mark {
+      display: none !important;
+    }
+
+    body.theme-glass .alert-sub { border-left-color: #F59E0B !important; }
+    body.theme-glass .alert-gift { border-left-color: #EC4899 !important; }
+    body.theme-glass .alert-raid { border-left-color: #06B6D4 !important; }
+
+    /* ============================================================
+       ELEMENTOS COMPARTILHADOS (Emotes, Badges, Status)
+       ============================================================ */
+    .emote {
+      display: inline-block;
+      height: 28px;
+      vertical-align: -6px;
+      margin: 0 2px;
     }
 
     .badges {
@@ -110,88 +247,10 @@
 
     .username-text {
       color: #ffffff;
-      font-weight: 900;
+      font-weight: 800;
       line-height: 1.2;
     }
 
-    /* Balão de Fala */
-    .speech-bubble {
-      position: relative;
-      background: var(--bubble-bg);
-      color: var(--bubble-text);
-      border: 2px solid var(--ink);
-      border-radius: 5px;
-      padding: 6px 12px 6px 10px;
-      font-size: 14.5px;
-      font-weight: 800;
-      line-height: 1.32;
-      margin-left: 8px;
-      margin-top: -2px;
-      display: inline-block;
-      max-width: 95%;
-      word-break: break-word;
-      box-shadow: 2px 2px 0 var(--shadow);
-    }
-
-    /* Rabicho do balão apontando para a esquerda (borda preta) */
-    .speech-bubble::before {
-      content: '';
-      position: absolute;
-      top: 5px;
-      left: -9px;
-      width: 0;
-      height: 0;
-      border-top: 5px solid transparent;
-      border-bottom: 5px solid transparent;
-      border-right: 9px solid var(--ink);
-      z-index: 2;
-    }
-
-    /* Preenchimento do rabicho (cobre a borda interna) */
-    .speech-bubble::after {
-      content: '';
-      position: absolute;
-      top: 5px;
-      left: -6px;
-      width: 0;
-      height: 0;
-      border-top: 4px solid transparent;
-      border-bottom: 4px solid transparent;
-      border-right: 7px solid var(--bubble-bg);
-      z-index: 3;
-    }
-
-    /* Emotes da Kick */
-    .emote {
-      display: inline-block;
-      height: 28px;
-      vertical-align: -6px;
-      margin: 0 2px;
-    }
-
-    /* Marcas de quadrinho estilo mangá: "?" e "!!" vermelhos */
-    .comic-mark {
-      position: absolute;
-      top: -12px;
-      right: -6px;
-      font-weight: 900;
-      font-size: 22px;
-      line-height: 1;
-      color: #ff1e27;
-      -webkit-text-stroke: 1.5px #ffffff;
-      paint-order: stroke fill;
-      text-shadow: 1px 1px 0 var(--ink), -1px 1px 0 var(--ink), 1px -1px 0 var(--ink), -1px -1px 0 var(--ink);
-      transform: rotate(14deg);
-      z-index: 5;
-      pointer-events: none;
-    }
-
-    /* Alertas Especiais (Subs, Presentes, Raids) */
-    .alert-sub  .username-tag { background: #D97706 !important; }
-    .alert-gift .username-tag { background: #DB2777 !important; }
-    .alert-raid .username-tag { background: #0891B2 !important; }
-
-    /* Indicador discreto de status */
     #status-pill {
       position: absolute;
       top: 10px;
@@ -214,7 +273,7 @@
     .status-dot.disconnected { background: #ff4444; box-shadow: 0 0 6px #ff4444; }
   </style>
 </head>
-<body>
+<body class="theme-comic">
 
   <div id="status-pill">
     <div class="status-dot" id="status-dot"></div>
@@ -226,10 +285,14 @@
   </div>
 
   <script>
-    // 1. Ler parâmetros da URL (?fade=20, ?channel=...)
+    // 1. Ler parâmetros da URL (?theme=glass, ?fade=20, ?channel=...)
     const urlParams = new URLSearchParams(window.location.search);
 
-    // 2. Detectar canal dinamicamente (pelo caminho /canalnome ou pelo parâmetro ?channel=canalnome)
+    // 2. Definir tema (padrão: comic | opção: glass)
+    const currentTheme = (urlParams.get('theme') || 'comic').toLowerCase();
+    document.body.className = currentTheme === 'glass' ? 'theme-glass' : 'theme-comic';
+
+    // 3. Detectar canal dinamicamente (/canal ou ?channel=canal)
     const pathSlug = window.location.pathname.replace(/^\/+/, '').split('/')[0].trim();
     const reservedPaths = ['events', 'test', 'api', 'favicon.ico', 'index.html'];
 
@@ -244,7 +307,6 @@
     const fadeTimeout = parseInt(urlParams.get('fade') || '25', 10);
     const maxMessages = parseInt(urlParams.get('max') || '20', 10);
     const hideStatus = urlParams.get('hide_status') === 'true';
-    const tagColorMode = urlParams.get('tag_color') || 'purple';
 
     const container = document.getElementById('chat-container');
     const statusPill = document.getElementById('status-pill');
@@ -275,7 +337,6 @@
       if (!identity) return '';
       let html = '<div class="badges">';
 
-      // Badges v2 com ícones oficiais (níveis coloridos, badges de sub)
       if (Array.isArray(identity.badges_v2) && identity.badges_v2.length > 0) {
         for (const badge of identity.badges_v2) {
           if (badge.image_url) {
@@ -296,13 +357,6 @@
       return html;
     }
 
-    function resolveTagColor(identity) {
-      if (tagColorMode === 'kick') return '#53FC18';
-      if (tagColorMode === 'user' && identity?.color) return identity.color;
-      return '#5e17eb'; // Roxo vibrante idêntico ao print
-    }
-
-    // Detecta interrogação ou exclamação final para adicionar a marca de quadrinho "? / !!"
     function detectComicMark(rawContent) {
       if (!rawContent) return '';
       const plain = rawContent.replace(/\[emote:[^\]]+\]/g, '').trim();
@@ -321,16 +375,23 @@
       wrapper.dataset.username = (msg.sender.username || '').toLowerCase();
 
       const username = msg.sender.username || 'Anônimo';
+      const userColor = msg.sender.identity?.color || '#53FC18';
       const badgesHtml = renderBadges(msg.sender.identity);
-      const tagBgColor = resolveTagColor(msg.sender.identity);
       const rawContent = msg.content || '';
       const parsedContent = parseEmotes(rawContent);
       const mark = detectComicMark(rawContent);
 
+      // No tema Glass, aplica a cor do usuário na borda neon esquerda
+      if (currentTheme === 'glass') {
+        wrapper.style.borderLeftColor = userColor;
+      }
+
+      const userStyle = currentTheme === 'glass' ? `style="color: ${userColor}"` : '';
+
       wrapper.innerHTML = `
-        <div class="username-tag" style="background-color: ${tagBgColor}">
+        <div class="username-tag">
           ${badgesHtml}
-          <span class="username-text">${escapeHtml(username)}</span>
+          <span class="username-text" ${userStyle}>${escapeHtml(username)}</span>
         </div>
         <div class="speech-bubble">
           ${mark ? `<span class="comic-mark">${mark}</span>` : ''}
